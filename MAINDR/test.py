@@ -1,109 +1,171 @@
-import sys
+from typing import AnyStr
+import re
+# coffe machine
+# 7-25-25
 
-import pygame
-from pygame.locals import *
-import numpy
+STATE = True
+ingredeints_in_tank = {"water":10000, "milk":1, "coffee":100000}
+
+# i did it like this bc i wanted a way to ref the menu item and have its reqs right there i also wanted them to be less memoru intesne so i made them immutable
+
+# oh boy
+recipes = {
+    "espresso": {"water": 50, "milk": 0, "coffee": 50},
+    "americano": {"water": 100, "milk": 0, "coffee": 50},
+    "latte": {"water": 50, "milk": 100, "coffee": 50}
+}
+
+price_of_items = {"espresso":3.75, "americano":5.65, "latte":4.97}
+
+coins = {
+        "penny":0.01,
+         "nickle":0.05,
+         "dime":0.10,
+         "quarter":0.25,
+         "half dollar":0.50,
+         "dollar coin":1.00
+         }
+
+
+def process_payment(amount:float):
+    """will handle change making as well"""
+    balance = [] #list of tuples
+    sum_of_ballance= 0
+    print(f"total: {amount}$\nplease enter the amount of each type of coin used to fufill the ballance")
+    # p = input("pennies: ")
+    # n = input("nickles: ")
+    # d = input("dimes: ")
+    # q = input("quarters: ")
+    # hd = input("half dollars: ")
+    # dc = input("dollar coins: ")
+    for i in coins.keys():
+        balance.append((i, int(input(f"{i}: "))))
+    print(balance)
+    for i in range(0, len(balance)):
+       sum_of_ballance += coins.get(balance[i][0]) * balance[i][1] # name of coin that refs teh value of the coin * num of coins entered by the user
+    print(round(sum_of_ballance,2) )
+
+    if sum_of_ballance < amount:
+        return f"insuficent balance, {sum_of_ballance:.2f}"
+
+    elif sum_of_ballance == amount:
+        return "suficent balance"
+    elif sum_of_ballance > amount:
+        # calculate_coin_change()
+        change = sum_of_ballance - amount
+        return f"suficent balance, your change: {change:.2f}"
+
+
+def remove_chars_not_in_menu_items(ui:str = ""):
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 
 
-pygame.init()
 
-SW = 1280
-SH = 720
-screen = pygame.display.set_mode((SW, SH))
-clock = pygame.time.Clock()
-running = True
-background_color = "black"
+    drinks = list(recipes.keys())
+    drinks_string = "".join(drinks)
+    # print(drinks_string)
+    letters = []
 
+    # for i in drinks:
+    #     letters.append([let for let in i])
+    #     # print(letters)
+
+    # successfuly generates my list of letters that are not contained in the menu items!!
+    for let in drinks_string:
+        if let in alphabet:
+            alphabet.remove(let)
+    return alphabet
+
+
+
+
+# has to check if reasorces exist before executing comands
+
+def report_ingredient_status():
+    """returns 1 string per ingredient that contains its amount (value) and ingredient name (key)"""
+    ingr = ingredeints_in_tank.items() # is a list now
+    report_list = [] #stores the report strings
+
+    for i in ingr:
+        # print(i) # is a tuple
+        # so i can acess it without separating the key val pairs
+        #  also this way i can just add items to the dict and thats all i have to do
+        name  = i[0]
+        amount = i[1]
+        report = f'{name}: {amount} {"ml" if name != "coffee" else "g"}'
+        report_list.append(report)
+
+    return report_list
+
+    # for i in report_list:
+    #     print(i)
 #
-#
-# class Ball:
-#     def __init__(self):
-#         # should start in the center of the screen
-#         self.x_pos = SW/2
-#         self.y_pos = SH/2
-#         #draw the ball
-# #         move the ball
-#
-#
-# class Paddle:
-#     def __init__(self):
-#         super()
-#         self.x_pos = SW / 3
-#         self.y_pos = SH / 2
-#
-#
-#
-#     def move(self,y:int=0) -> int:
-#         if y <0:
-#             self.y_pos =- 30
-#             return (self.y_pos)
-#         if y > 0:
-#             self.y_pos += 30
-#             return (self.y_pos)
-#
-#
-# paddle_LEFT = Paddle()
-left = 30
-top = 30
-width =30
-height = 30
-while running:
-    keys = pygame.key.get_pressed()
+def resource_check(drink:str): #list of resource amounts
+     # why does this work, list wrapped it bc was throwing a instance error
+    result_1 ={}
+    result = {drink:result_1}
+
+    for n in ingredeints_in_tank:
+        if recipes.get(drink).get(n) > ingredeints_in_tank.get(n):
+            result_1.update({n: "Insufficient"})
+        elif recipes.get(drink).get(n) <= ingredeints_in_tank.get(n):
+            result_1.update({n: "Sufficient"})
+        else:
+            print("look in resouirce check")
+    return result
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+def make_bevrage(drink:str):
+    rc= resource_check(drink).get(drink)
+
+
+    # ris = report_ingredient_status()
+
+    output = []
+    if "Insufficient" in rc.values():
+        print(f"sorry insucficent ingredients cannot make {drink}")
+    elif "Insufficient" not in rc.values():
+        print(process_payment(price_of_items.get(drink)))
 
 
 
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if keys[pygame.K_ESCAPE]:
-            running = False
+def end_sequence():
+    return "Thank you for your business"
 
+# print(resource_check("latte"))
 
+while STATE == True:
+    user_choice = input("we have available:\nEspresso\nAmericano\nLatte\nWhat beverage would you like today:").strip(" ").lower()
+    # s = '@#24l-09=a()&8973t**_##te'
+    # user_choice = re.sub(r'[^A-Za-z]', '', s)
 
+    user_choice = re.sub(r'[^A-Za-z]', '', user_choice) # strips out all non letters
+    user_choice = re.sub(r'[]')
 
-        if keys[pygame.K_w]:
-            if height >= 650:
-                height = height
-                top = top
-            else:
-                height += 30
-                
-
-
-        if keys[pygame.K_s]:
-            if height < 0:
-                height = height
-                top = top
-
-            else:
-                height -= 30
-                # top +=30
+    print(user_choice)
+    if user_choice in recipes.keys():
+        make_bevrage(user_choice)
 
 
 
 
 
 
+    # if user_choice == "exit" or user_choice == "stop" or user_choice == "cancel":
+    #     STATE = False
+    # elif user_choice == "espresso":
+    #     print(make_bevrage("espresso"))
+    #     print(end_sequence())
+    #
+    #
+    # elif user_choice == "americano":
+    #     print(make_bevrage("americano"))
+    #
+    # elif user_choice == "latte":
+    #     print(make_bevrage("latte"))
 
+# print(make_bevrage("latte"))
 
-
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill(background_color)
-    pygame.draw.rect(screen, "white", pygame.Rect(left, top, width, height))
-
-
-    # RENDER YOUR GAME HERE
-
-    # flip() the display to put your work on screen
-    pygame.display.flip()
-
-    clock.tick(60)  # limits FPS to 60
-
-pygame.quit()
-
-
-
-# make window
+# report_ingredient_status()
