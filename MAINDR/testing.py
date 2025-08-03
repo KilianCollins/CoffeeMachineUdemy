@@ -96,11 +96,11 @@ price_of_items = {"espresso":3.75, "americano":5.65, "latte":4.97}
 #
 
 
-def remove_chars_not_in_menu_items(ui: str = ""):
+def remove_chars_not_in_menu_items(dict_name:dict):
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
                 'v', 'w', 'x', 'y', 'z']
 
-    drinks = list(recipes.keys())
+    drinks = list(dict_name.keys())
     drinks_string = "".join(drinks)
     # print(drinks_string)
     letters = []
@@ -115,8 +115,8 @@ def remove_chars_not_in_menu_items(ui: str = ""):
             alphabet.remove(let)
     return alphabet
 
-dis_allowed_alphabeta = remove_chars_not_in_menu_items()
+dis_allowed_alphabeta = remove_chars_not_in_menu_items(dict_name=recipes)
 
-
+print(dis_allowed_alphabeta)
 
 

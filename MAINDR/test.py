@@ -56,13 +56,11 @@ def process_payment(amount:float):
         return f"suficent balance, your change: {change:.2f}"
 
 
-def remove_chars_not_in_menu_items(ui:str = ""):
-    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+def remove_chars_not_in_menu_items(dict_name:dict):
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+                'v', 'w', 'x', 'y', 'z']
 
-
-
-
-    drinks = list(recipes.keys())
+    drinks = list(dict_name.keys())
     drinks_string = "".join(drinks)
     # print(drinks_string)
     letters = []
@@ -76,6 +74,8 @@ def remove_chars_not_in_menu_items(ui:str = ""):
         if let in alphabet:
             alphabet.remove(let)
     return alphabet
+
+dis_allowed_alphabet = remove_chars_not_in_menu_items(dict_name=recipes)
 
 
 
@@ -140,12 +140,19 @@ while STATE == True:
     user_choice = input("we have available:\nEspresso\nAmericano\nLatte\nWhat beverage would you like today:").strip(" ").lower()
     # s = '@#24l-09=a()&8973t**_##te'
     # user_choice = re.sub(r'[^A-Za-z]', '', s)
+    strip_str = ""
+    for i in dis_allowed_alphabet:
+        strip_str = strip_str.join(i+ " *")
+
+
 
     user_choice = re.sub(r'[^A-Za-z]', '', user_choice) # strips out all non letters
-    user_choice = re.sub(r'[]')
+    user_choice = re.sub(f"[{strip_str}]", "", user_choice)
 
     print(user_choice)
-    if user_choice in recipes.keys():
+    if user_choice not in recipes.keys():
+        print("Sorry invalid input trygain")
+    elif user_choice in recipes.keys():
         make_bevrage(user_choice)
 
 
